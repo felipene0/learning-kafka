@@ -1,3 +1,2 @@
-starting_kafka.log
-zookeeper.log
+/log
 .env

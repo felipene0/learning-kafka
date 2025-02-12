@@ -2,14 +2,25 @@ import requests
 import logging
 import json
 import subprocess
+import os
+from dotenv import load_dotenv
 from confluent_kafka import Producer, KafkaException
 
-KAKFA_SERVER = 'localhost:9092'
-KAKFA_TOPIC = 'testing_forecast'
+load_dotenv()
+
+KAFKA_SERVER = os.getenv('KAFKA_SERVER')
+REDPANDA_USER = os.getenv('REDPANDA_USER')
+REDPANDA_PWD = os.getenv('REDPANDA_PWD')
+KAFKA_TOPIC = os.getenv('KAFKA_TOPIC')
+
 conf = {
-    'bootstrap.servers': KAKFA_SERVER,
+    'bootstrap.servers': KAFKA_SERVER,
     'client.id': 'weather-producer',
     'session.timeout.ms': 6000,
+    'security.protocol': 'SASL_SSL',
+    'sasl.mechanism': 'SCRAM-SHA-256',
+    'sasl.username': REDPANDA_USER,
+    'sasl.password': REDPANDA_PWD,
 }
 
 API_URL = 'https://api.open-meteo.com/v1/forecast'
@@ -34,7 +45,7 @@ def send_to_kafka(data):
     producer = Producer(conf)
     try:
         message = json.dumps(data)
-        producer.produce(KAKFA_TOPIC, value=message)
+        producer.produce(KAFKA_TOPIC, value=message)
         producer.flush()
         logging.info("Message sent to Kafka sucessfully")
     except KafkaException as e:
@@ -47,11 +58,13 @@ def main():
             send_to_kafka(weather_data)
         
 if __name__ == "__main__":
-    sh = './start.sh'
-    process = subprocess.run(["bash", sh], check=True)
+    main()
     
-    if process.returncode == 0:
-        logging.info("Zookeeper and Kafka started successfully.")
-        main()
-    else:
-        logging.error("Error starting services.")
+    # sh = './start.sh'
+    # process = subprocess.run(["bash", sh], check=True)
+    
+    # if process.returncode == 0:
+    #     logging.info("Zookeeper and Kafka started successfully.")
+    #     main()
+    # else:
+    #     logging.error("Error starting services.")

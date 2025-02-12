@@ -1,17 +1,27 @@
 import logging
 import json
+import os
+from dotenv import load_dotenv
 from confluent_kafka import Consumer, KafkaException, KafkaError
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 
-KAFKA_SERVER = 'localhost:9092'
-KAFKA_TOPIC = 'testing_forecast'
+KAFKA_SERVER = os.getenv('KAFKA_SERVER')
+REDPANDA_USER = os.getenv('REDPANDA_USER')
+REDPANDA_PWD = os.getenv('REDPANDA_PWD')
+KAFKA_TOPIC = os.getenv('KAFKA_TOPIC')
 
 conf = {
     'bootstrap.servers': KAFKA_SERVER,
     'group.id': 'reader',
     'enable.auto.offset.store': False, # Must me set to False in order to use store_offset()
     # 'auto.offset.reset': 'latest',
+    'security.protocol': 'SASL_SSL',
+    'sasl.mechanism': 'SCRAM-SHA-256',
+    'sasl.username': REDPANDA_USER,
+    'sasl.password': REDPANDA_PWD,
 }
 
 def read_from_kafka():
