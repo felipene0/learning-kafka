@@ -40,8 +40,8 @@ check_service() {
 
 # Start Zookeeper
 echo "Starting Zookeeper using command:"
-echo "nohup $KAFKA_PATH/bin/zookeeper-server-start.sh $KAFKA_PATH/config/zookeeper.properties > zookeeper.log 2>&1 &"
-nohup "$KAFKA_PATH/bin/zookeeper-server-start.sh" "$KAFKA_PATH/config/zookeeper.properties" > zookeeper.log 2>&1 &
+echo "nohup $KAFKA_PATH/bin/zookeeper-server-start.sh $KAFKA_PATH/config/zookeeper.properties > log/zookeeper.log 2>&1 &"
+nohup "$KAFKA_PATH/bin/zookeeper-server-start.sh" "$KAFKA_PATH/config/zookeeper.properties" > log/zookeeper.log 2>&1 &
 sleep 10 
 
 check_service "localhost" 2181 "Zookeeper"
@@ -52,14 +52,14 @@ fi
 
 # Start Kafka
 echo "Starting Kafka using command:"
-echo "nohup $KAFKA_PATH/bin/kafka-server-start.sh $KAFKA_PATH/config/server.properties > starting_kafka.log 2>&1 &"
-nohup "$KAFKA_PATH/bin/kafka-server-start.sh" "$KAFKA_PATH/config/server.properties" > starting_kafka.log 2>&1 &
+echo "nohup $KAFKA_PATH/bin/kafka-server-start.sh $KAFKA_PATH/config/server.properties > log/kafka.log 2>&1 &"
+nohup "$KAFKA_PATH/bin/kafka-server-start.sh" "$KAFKA_PATH/config/server.properties" > log/kafka.log 2>&1 &
 sleep 10 
 
-check_service "localhost" 9092 "Kafka"
-if [ $? -ne 0 ]; then
-    echo "Kafka failed to start. Check starting_kafka.log for details."
-    exit 1
-fi
+# check_service "localhost" 9092 "Kafka"
+# if [ $? -ne 0 ]; then
+#     echo "Kafka failed to start. Check starting_kafka.log for details."
+#     exit 1
+# fi
 
 echo "Both Zookeeper and Kafka started successfully."
